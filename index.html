@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram iOS Final Stable</title>
+<title>Telegram iOS Perfect</title>
 
 <style>
 body{
@@ -16,10 +16,7 @@ background-size:cover;
 background-position:center;
 }
 
-*{
--webkit-user-select:none;
-user-select:none;
-}
+*{-webkit-user-select:none;user-select:none;}
 
 #chatArea{
 flex:1;
@@ -27,22 +24,27 @@ overflow-y:auto;
 padding:12px;
 display:flex;
 flex-direction:column;
-gap:4px; /* lebih rapet */
+gap:4px;
 }
 
 @keyframes bubbleIn{
-0%{transform:translateX(25px) scale(.9);opacity:0;}
+0%{transform:translateX(30px) scale(.9);opacity:0;}
 100%{transform:translateX(0) scale(1);opacity:1;}
 }
 
+@keyframes collapse{
+0%{opacity:1;max-height:200px;}
+100%{opacity:0;max-height:0;}
+}
+
 @keyframes popupIn{
-0%{transform:translate(-50%,-50%) scale(.7);opacity:0;}
+0%{transform:translate(-50%,-50%) scale(.8);opacity:0;}
 100%{transform:translate(-50%,-50%) scale(1);opacity:1;}
 }
 
 @keyframes slideUp{
-0%{transform:translateY(100%);opacity:0;}
-100%{transform:translateY(0);opacity:1;}
+0%{transform:translateY(100%);}
+100%{transform:translateY(0);}
 }
 </style>
 </head>
@@ -52,8 +54,8 @@ gap:4px; /* lebih rapet */
 <div id="chatArea"></div>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- KOLOM KETIK (TIDAK DIUBAH 1px) -->
-<div style="padding:10px 12px; position:relative; z-index:5;">
+<!-- KOLOM KETIK (ASLI TIDAK DIUBAH) -->
+<div style="padding:10px 12px;position:relative;z-index:5;">
 <div style="display:flex;align-items:center;background:#1f2c34;border-radius:999px;height:44px;padding:0 12px;box-shadow:0 4px 12px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.05);">
 
 <svg onclick="toggleEmoji()" viewBox="0 0 24 24"
@@ -87,10 +89,10 @@ style="width:24px;height:24px;transform:scale(1.8);margin-right:8px;cursor:point
 
 <!-- EMOJI PANEL -->
 <div id="emojiPanel" style="display:none;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);padding:12px;animation:slideUp .25s ease;">
-<span onclick="addEmoji('😭')" style="font-size:26px;margin:8px;cursor:pointer;">😭</span>
-<span onclick="addEmoji('😂')" style="font-size:26px;margin:8px;cursor:pointer;">😂</span>
-<span onclick="addEmoji('❤️')" style="font-size:26px;margin:8px;cursor:pointer;">❤️</span>
-<span onclick="addEmoji('👍')" style="font-size:26px;margin:8px;cursor:pointer;">👍</span>
+<span onclick="addEmoji('😭')" style="font-size:26px;margin:8px;">😭</span>
+<span onclick="addEmoji('😂')" style="font-size:26px;margin:8px;">😂</span>
+<span onclick="addEmoji('❤️')" style="font-size:26px;margin:8px;">❤️</span>
+<span onclick="addEmoji('👍')" style="font-size:26px;margin:8px;">👍</span>
 </div>
 
 <div id="overlay" style="position:fixed;inset:0;display:none;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);z-index:10;"></div>
@@ -120,17 +122,18 @@ bubble.style.background="#248C46";
 bubble.style.color="white";
 bubble.style.borderRadius="18px";
 bubble.style.maxWidth="75%";
-bubble.style.animation="bubbleIn .2s cubic-bezier(.34,1.56,.64,1)";
-bubble.style.position="relative";
+bubble.style.animation="bubbleIn .25s cubic-bezier(.34,1.56,.64,1)";
 bubble.style.overflow="hidden";
-bubble.style.padding=isImage?"2px":"8px 12px";
+bubble.style.display="inline-flex";
+bubble.style.flexWrap="wrap";
+bubble.style.alignItems="flex-end";
+bubble.style.padding=isImage?"0":"8px 12px";
 
 if(isImage){
 const img=document.createElement("img");
 img.src=content;
 img.style.width="100%";
 img.style.display="block";
-img.style.borderRadius="16px";
 bubble.appendChild(img);
 }
 
@@ -140,15 +143,11 @@ text.textContent=content;
 bubble.appendChild(text);
 }
 
-const meta=document.createElement("div");
-meta.style.position=isImage?"absolute":"static";
-meta.style.right=isImage?"6px":"";
-meta.style.bottom=isImage?"6px":"";
+const meta=document.createElement("span");
 meta.style.fontSize="11px";
-meta.style.opacity=".9";
-meta.style.color="white";
+meta.style.opacity=".85";
+meta.style.marginLeft="6px";
 meta.innerHTML=getTime()+` <span class="check" style="color:rgba(255,255,255,.6)">✔✔</span>`;
-
 bubble.appendChild(meta);
 
 chatArea.appendChild(bubble);
@@ -159,23 +158,19 @@ meta.querySelector(".check").style.transition="color .3s ease";
 meta.querySelector(".check").style.color="#4FC3F7";
 },2000);
 
-/* LONG PRESS FIXED */
+/* Long Press */
 let timer;
-bubble.addEventListener("pointerdown",()=>{
-timer=setTimeout(()=>showPopup(bubble),400);
-});
+bubble.addEventListener("pointerdown",()=>{timer=setTimeout(()=>showMenu(bubble),400);});
 bubble.addEventListener("pointerup",()=>clearTimeout(timer));
 }
 
 fileInput.onchange=function(e){
 const reader=new FileReader();
-reader.onload=function(){
-createBubble(reader.result,true);
-}
+reader.onload=function(){createBubble(reader.result,true);}
 reader.readAsDataURL(e.target.files[0]);
 }
 
-function showPopup(bubble){
+function showMenu(bubble){
 overlay.style.display="block";
 
 const menu=document.createElement("div");
@@ -183,19 +178,20 @@ menu.style.position="fixed";
 menu.style.left="50%";
 menu.style.top="50%";
 menu.style.transform="translate(-50%,-50%)";
-menu.style.background="white";
+menu.style.background="rgba(28,28,30,.95)";
+menu.style.color="white";
 menu.style.borderRadius="18px";
 menu.style.padding="12px";
 menu.style.width="220px";
-menu.style.animation="popupIn .2s ease";
+menu.style.animation="popupIn .25s cubic-bezier(.34,1.56,.64,1)";
 menu.style.zIndex="20";
 
 menu.innerHTML=`
-<div onclick="deleteMsg()" style="padding:10px;color:red;">Delete</div>
-<hr>
-<div onclick="editMsg()" style="padding:10px;">Edit</div>
-<hr>
-<div onclick="closePopup()" style="padding:10px;">Batal</div>
+<div onclick="deleteMsg()" style="padding:12px;color:#ff453a;">Delete</div>
+<hr style="border:.5px solid rgba(255,255,255,.2);">
+<div onclick="editMsg()" style="padding:12px;">Edit</div>
+<hr style="border:.5px solid rgba(255,255,255,.2);">
+<div onclick="closeMenu()" style="padding:12px;">Batal</div>
 `;
 
 document.body.appendChild(menu);
@@ -203,20 +199,22 @@ window.currentBubble=bubble;
 window.currentMenu=menu;
 }
 
-function closePopup(){
+function closeMenu(){
 overlay.style.display="none";
 if(window.currentMenu) document.body.removeChild(window.currentMenu);
 }
 
 function deleteMsg(){
-window.currentBubble.innerHTML="Pesan telah dihapus";
-closePopup();
+const b=window.currentBubble;
+b.style.animation="collapse .25s forwards";
+setTimeout(()=>b.remove(),250);
+closeMenu();
 }
 
 function editMsg(){
-const t=prompt("Edit pesan:");
-if(t) window.currentBubble.firstChild.textContent=t;
-closePopup();
+const newText=prompt("Edit pesan:");
+if(newText) window.currentBubble.firstChild.textContent=newText;
+closeMenu();
 }
 
 function toggleEmoji(){
@@ -224,9 +222,7 @@ const p=document.getElementById("emojiPanel");
 p.style.display=p.style.display==="none"?"block":"none";
 }
 
-function addEmoji(e){
-input.value+=e;
-}
+function addEmoji(e){input.value+=e;}
 </script>
 
 </body>
