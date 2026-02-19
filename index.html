@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram iOS Perfect</title>
+<title>Telegram iOS Perfect Stable</title>
 </head>
 
 <body style="
@@ -14,9 +14,9 @@ font-family:-apple-system,BlinkMacSystemFont,sans-serif;
 background:url('https://res.cloudinary.com/dtdodhqqi/image/upload/v1771310542/c36725a5a2a254a5df8c7dd4bdaa05af_v3tzna.jpg');
 background-size:cover;
 background-position:center;
-overflow:hidden;
 ">
 
+<!-- CHAT AREA -->
 <div id="chatArea" style="
 flex:1;
 overflow-y:auto;
@@ -28,8 +28,12 @@ gap:8px;
 
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- KOLOM KETIK (TIDAK DIUBAH) -->
-<div style="padding:10px 12px;">
+<!-- ===================== -->
+<!-- KOLOM KETIK (ASLI) -->
+<!-- ===================== -->
+
+<div style="padding:10px 12px; position:relative; z-index:5;">
+
 <div style="
 display:flex;
 align-items:center;
@@ -42,6 +46,7 @@ box-shadow:
 inset 0 1px 0 rgba(255,255,255,0.05);
 ">
 
+<!-- EMOJI -->
 <svg onclick="toggleEmoji()" viewBox="0 0 24 24"
 fill="none"
 stroke="#2AABEE"
@@ -71,6 +76,7 @@ font-size:16px;
 height:100%;
 ">
 
+<!-- ATTACH -->
 <svg onclick="document.getElementById('fileInput').click()" viewBox="0 0 24 24"
 fill="none"
 stroke="#2AABEE"
@@ -86,6 +92,7 @@ cursor:pointer;">
 <path d="M7 13l6-6a3 3 0 114 4l-8 8a5 5 0 11-7-7l9-9"/>
 </svg>
 
+<!-- SEND -->
 <div onclick="sendMessage()" style="
 width:44px;
 height:44px;
@@ -108,12 +115,14 @@ box-shadow:0 4px 12px rgba(0,0,0,0.4);
 </div>
 </div>
 
+<!-- BLUR OVERLAY -->
 <div id="overlay" style="
 position:fixed;
 inset:0;
 display:none;
-backdrop-filter:blur(10px);
+backdrop-filter:blur(8px);
 background:rgba(0,0,0,0.3);
+z-index:10;
 "></div>
 
 <script>
@@ -145,9 +154,9 @@ bubble.style.borderRadius="14px";
 bubble.style.maxWidth="75%";
 bubble.style.fontSize="14px";
 bubble.style.wordWrap="break-word";
-bubble.style.transform="scale(0.8)";
+bubble.style.transform="scale(0.9)";
 bubble.style.opacity="0";
-bubble.style.transition="all 0.25s cubic-bezier(.34,1.56,.64,1)";
+bubble.style.transition="all .25s cubic-bezier(.34,1.56,.64,1)";
 
 if(isImage){
 const img=document.createElement("img");
@@ -175,7 +184,7 @@ bubble.style.opacity="1";
 },10);
 
 setTimeout(()=>{
-meta.querySelector(".check").style.transition="color 0.3s ease";
+meta.querySelector(".check").style.transition="color .3s ease";
 meta.querySelector(".check").style.color="#0084FF";
 },2000);
 
@@ -202,13 +211,14 @@ const menu=document.createElement("div");
 menu.style.position="fixed";
 menu.style.left="50%";
 menu.style.top="50%";
-menu.style.transform="translate(-50%,-50%) scale(0.8)";
+menu.style.transform="translate(-50%,-50%) scale(.8)";
 menu.style.background="white";
 menu.style.borderRadius="16px";
 menu.style.padding="10px";
 menu.style.width="220px";
 menu.style.boxShadow="0 10px 40px rgba(0,0,0,0.4)";
-menu.style.transition="all 0.25s ease";
+menu.style.transition="all .25s ease";
+menu.style.zIndex="20";
 
 menu.innerHTML=`
 <div onclick="deleteMsg()" style="padding:10px;color:red;">Delete</div>
@@ -227,7 +237,7 @@ window.currentMenu=menu;
 
 function closePopup(){
 overlay.style.display="none";
-document.body.removeChild(window.currentMenu);
+if(window.currentMenu) document.body.removeChild(window.currentMenu);
 }
 
 function deleteMsg(){
