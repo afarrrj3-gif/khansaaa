@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IP Chat Perfect</title>
+<title>IP Chat Green</title>
 </head>
 
 <body style="
@@ -26,12 +26,11 @@ flex-direction:column;
 gap:8px;
 "></div>
 
-<!-- FILE INPUT -->
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- ========================= -->
-<!-- KOLOM KETIK (TIDAK DIUBAH) -->
-<!-- ========================= -->
+<!-- ===================== -->
+<!-- KOLOM KETIK ASLI -->
+<!-- ===================== -->
 
 <div style="padding:10px 12px;">
 
@@ -48,7 +47,7 @@ inset 0 1px 0 rgba(255,255,255,0.05);
 ">
 
 <!-- EMOJI -->
-<svg onclick="addEmoji()" viewBox="0 0 24 24"
+<svg onclick="toggleEmoji()" viewBox="0 0 24 24"
 fill="none"
 stroke="#2AABEE"
 stroke-width="2"
@@ -66,7 +65,6 @@ cursor:pointer;">
 <path d="M8 14c2.2 2.4 5.8 2.4 8 0"/>
 </svg>
 
-<!-- INPUT -->
 <input id="msgInput" type="text" placeholder="Message"
 style="
 flex:1;
@@ -101,7 +99,7 @@ height:44px;
 min-width:44px;
 min-height:44px;
 flex-shrink:0;
-background:#2AABEE;
+background:#25D366;
 border-radius:50%;
 display:flex;
 justify-content:center;
@@ -119,16 +117,30 @@ box-shadow:0 4px 12px rgba(0,0,0,0.4);
 </div>
 </div>
 
+<!-- EMOJI PANEL -->
+<div id="emojiPanel" style="
+display:none;
+background:#111;
+padding:10px;
+border-top:1px solid rgba(255,255,255,0.1);
+">
+
+<span onclick="addEmoji('😭')" style="font-size:22px;margin:6px;cursor:pointer;">😭</span>
+<span onclick="addEmoji('😂')" style="font-size:22px;margin:6px;cursor:pointer;">😂</span>
+<span onclick="addEmoji('❤️')" style="font-size:22px;margin:6px;cursor:pointer;">❤️</span>
+<span onclick="addEmoji('👍')" style="font-size:22px;margin:6px;cursor:pointer;">👍</span>
+
+</div>
+
 <script>
 
-const chatArea = document.getElementById("chatArea");
-const input = document.getElementById("msgInput");
-const fileInput = document.getElementById("fileInput");
+const chatArea=document.getElementById("chatArea");
+const input=document.getElementById("msgInput");
+const fileInput=document.getElementById("fileInput");
 
 function getTime(){
-const d = new Date();
-return d.getHours().toString().padStart(2,'0') + ":" +
-d.getMinutes().toString().padStart(2,'0');
+const d=new Date();
+return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0');
 }
 
 function sendMessage(){
@@ -137,34 +149,36 @@ createBubble(input.value);
 input.value="";
 }
 
-function createBubble(text, isImage=false){
+function createBubble(content,isImage=false){
 
-const bubble = document.createElement("div");
+const bubble=document.createElement("div");
 bubble.style.alignSelf="flex-end";
-bubble.style.background="#2AABEE";
+bubble.style.background="#25D366";
 bubble.style.color="white";
 bubble.style.padding="8px 10px";
-bubble.style.borderRadius="14px";
+bubble.style.borderRadius="12px";
 bubble.style.maxWidth="75%";
 bubble.style.fontSize="14px";
+bubble.style.border="1px solid rgba(0,0,0,0.1)";
 bubble.style.wordWrap="break-word";
-bubble.style.border="1px solid rgba(255,255,255,0.1)";
+bubble.style.position="relative";
 
 if(isImage){
 const img=document.createElement("img");
-img.src=text;
+img.src=content;
 img.style.width="100%";
-img.style.borderRadius="10px";
+img.style.borderRadius="8px";
 bubble.appendChild(img);
 }else{
-bubble.innerHTML=text;
+bubble.appendChild(document.createTextNode(content));
 }
 
 const meta=document.createElement("div");
 meta.style.fontSize="10px";
 meta.style.marginTop="4px";
+meta.style.textAlign="right";
 meta.innerHTML=getTime()+
-` <span class="check" style="color:gray">✔✔</span>`;
+` <span class="check" style="color:gray;">✔✔</span>`;
 
 bubble.appendChild(meta);
 chatArea.appendChild(bubble);
@@ -174,7 +188,6 @@ setTimeout(()=>{
 meta.querySelector(".check").style.color="#00BFFF";
 },2000);
 
-// LONG PRESS
 let pressTimer;
 bubble.onmousedown=()=>{pressTimer=setTimeout(()=>showPopup(bubble),500);}
 bubble.onmouseup=()=>clearTimeout(pressTimer);
@@ -191,15 +204,14 @@ reader.readAsDataURL(e.target.files[0]);
 function showPopup(bubble){
 const popup=document.createElement("div");
 popup.style.position="fixed";
-popup.style.bottom="100px";
+popup.style.bottom="120px";
 popup.style.left="50%";
 popup.style.transform="translateX(-50%)";
 popup.style.background="white";
 popup.style.borderRadius="12px";
-popup.style.padding="10px";
+popup.style.padding="8px";
 popup.style.width="200px";
-popup.style.textAlign="center";
-
+popup.style.boxShadow="0 6px 20px rgba(0,0,0,0.4)";
 popup.innerHTML=`
 <div onclick="deleteMsg()" style="padding:8px;color:red;">Delete</div>
 <hr>
@@ -207,7 +219,6 @@ popup.innerHTML=`
 <hr>
 <div onclick="closePopup()" style="padding:8px;">Batal</div>
 `;
-
 document.body.appendChild(popup);
 window.currentBubble=bubble;
 window.currentPopup=popup;
@@ -225,13 +236,18 @@ closePopup();
 function editMsg(){
 const text=prompt("Edit pesan:");
 if(text){
-window.currentBubble.innerHTML=text;
+window.currentBubble.childNodes[0].nodeValue=text;
 }
 closePopup();
 }
 
-function addEmoji(){
-input.value+="😭";
+function toggleEmoji(){
+const panel=document.getElementById("emojiPanel");
+panel.style.display=panel.style.display==="none"?"block":"none";
+}
+
+function addEmoji(e){
+input.value+=e;
 }
 
 </script>
