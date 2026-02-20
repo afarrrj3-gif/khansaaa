@@ -1,359 +1,282 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram iOS Final Proper</title>
+<title>Chat IP Style</title>
 
 <style>
-body{
-margin:0;
-height:100vh;
-display:flex;
-flex-direction:column;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:url('https://res.cloudinary.com/dtdodhqqi/image/upload/v1771310542/c36725a5a2a254a5df8c7dd4bdaa05af_v3tzna.jpg') center/cover no-repeat;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
 }
 
-*{-webkit-user-select:none;user-select:none;}
-
-#chatArea{
-flex:1;
-overflow-y:auto;
-padding:12px;
-display:flex;
-flex-direction:column;
-gap:4px;
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: url("https://res.cloudinary.com/dtdodhqqi/image/upload/v1771310542/c36725a5a2a254a5df8c7dd4bdaa05af_v3tzna.jpg");
+    background-size: cover;
+    background-position: center;
 }
 
-@keyframes bubbleIn{
-0%{transform:translateY(8px) scale(.96);opacity:0;}
-100%{transform:translateY(0) scale(1);opacity:1;}
+/* CHAT AREA */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
 }
 
-@keyframes collapse{
-0%{opacity:1;max-height:200px;}
-100%{opacity:0;max-height:0;}
+/* MESSAGE */
+.message {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    position: relative;
+    animation: fadeIn 0.25s ease forwards;
+    word-wrap: break-word;
 }
 
-@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
-/* ===== BUBBLE ===== */
-.bubble{
-align-self:flex-end;
-background:#248C46;
-color:white;
-border-radius:18px;
-max-width:75%;
-display:inline-flex;
-flex-wrap:wrap;
-align-items:flex-end;
-padding:8px 12px;
-animation:bubbleIn .25s cubic-bezier(.34,1.56,.64,1);
-position:relative;
-overflow:hidden;
-font-size:14px;
+.sent {
+    align-self: flex-end;
+    background: #dcf8c6;
 }
 
-.bubble.image{
-padding:0;
-border:1px solid rgba(255,255,255,.18);
+.received {
+    align-self: flex-start;
+    background: white;
 }
 
-.bubble.image img{
-width:100%;
-display:block;
+/* TIME + STATUS */
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    margin-top: 4px;
+    justify-content: flex-end;
+    opacity: 0.7;
 }
 
-.meta{
-font-size:11px;
-opacity:.9;
-margin-left:6px;
-white-space:nowrap;
-display:flex;
-align-items:center;
-gap:3px;
+.meta svg {
+    width: 14px;
+    height: 14px;
 }
 
-.meta.image{
-position:absolute;
-right:8px;
-bottom:6px;
-background:rgba(0,0,0,.45);
-padding:2px 6px;
-border-radius:10px;
+.blue {
+    fill: #34b7f1;
 }
 
-.check{
-color:rgba(255,255,255,.6);
-transition:color .3s;
+/* IMAGE MESSAGE */
+.chat-image {
+    max-width: 220px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.15);
+    overflow: hidden;
+    cursor: pointer;
 }
 
-.deleted{
-opacity:.6;
-font-style:italic;
-font-size:13px;
+.chat-image img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
 }
 
-/* ===== INPUT BAR (TIDAK DIUBAH STRUKTUR) ===== */
-.inputWrap{
-padding:10px 12px;
-position:relative;
-z-index:5;
+/* INPUT */
+.chat-input {
+    display: flex;
+    padding: 10px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(5px);
 }
 
-.inputInner{
-display:flex;
-align-items:center;
-background:#1f2c34;
-border-radius:999px;
-height:44px;
-padding:0 12px;
-box-shadow:0 4px 12px rgba(0,0,0,.4);
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
 }
 
-.inputInner input{
-flex:1;
-border:none;
-outline:none;
-background:transparent;
-color:white;
-font-size:16px;
+.chat-input button {
+    margin-left: 8px;
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: none;
+    background: #128c7e;
+    color: white;
+    cursor: pointer;
 }
 
-/* ===== EMOJI PANEL ===== */
-#emojiPanel{
-display:none;
-background:rgba(0,0,0,.6);
-backdrop-filter:blur(12px);
-padding:12px;
-animation:bubbleIn .2s ease;
+/* DELETE TEXT */
+.deleted {
+    font-style: italic;
+    opacity: 0.6;
 }
 
-/* ===== OVERLAY ===== */
-#overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.5);
-backdrop-filter:blur(12px);
-display:none;
-z-index:20;
+/* FULLSCREEN MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    animation: fadeIn 0.3s ease;
 }
 
-/* ===== MENU ===== */
-.menu{
-position:fixed;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-background:rgba(28,28,30,.95);
-color:white;
-border-radius:18px;
-padding:12px;
-width:220px;
-z-index:30;
-animation:fadeIn .2s;
+.modal img {
+    max-width: 90%;
+    max-height: 80%;
+    border-radius: 10px;
 }
 
-/* ===== VIEWER ===== */
-#viewer{
-position:fixed;
-inset:0;
-display:none;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-background:rgba(0,0,0,.9);
-z-index:40;
-animation:fadeIn .2s;
+.modal button {
+    margin-top: 15px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
 }
 
-#viewer img{
-max-width:90%;
-max-height:70%;
-border-radius:16px;
-}
-
-.viewerBtn{
-margin-top:12px;
-padding:10px 20px;
-border:none;
-border-radius:14px;
-background:#1c1c1e;
-color:white;
-font-size:14px;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 </head>
 
-<body oncontextmenu="return false">
+<body>
 
-<div id="chatArea"></div>
-<input type="file" id="fileInput" accept="image/*" style="display:none">
+<div class="chat-container" id="chatContainer"></div>
 
-<!-- INPUT -->
-<div class="inputWrap">
-<div class="inputInner">
-
-<!-- EMOJI SVG ICON -->
-<svg onclick="toggleEmoji()" viewBox="0 0 24 24"
-fill="none" stroke="#2AABEE" stroke-width="2"
-stroke-linecap="round" stroke-linejoin="round"
-style="width:22px;height:22px;margin-right:14px;cursor:pointer;">
-<circle cx="12" cy="12" r="9"/>
-<circle cx="9" cy="10" r="1" fill="#2AABEE" stroke="none"/>
-<circle cx="15" cy="10" r="1" fill="#2AABEE" stroke="none"/>
-<path d="M8 14c2 2 6 2 8 0"/>
-</svg>
-
-<input id="msgInput" placeholder="Message">
-
-<!-- ATTACH SVG -->
-<svg onclick="fileInput.click()" viewBox="0 0 24 24"
-fill="none" stroke="#2AABEE" stroke-width="2"
-stroke-linecap="round" stroke-linejoin="round"
-style="width:22px;height:22px;margin:0 10px;cursor:pointer;">
-<path d="M7 13l6-6a3 3 0 114 4l-8 8a5 5 0 11-7-7l9-9"/>
-</svg>
-
-<!-- SEND -->
-<div onclick="sendMessage()" style="width:40px;height:40px;background:#2AABEE;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;">
-<svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-<path d="M3 20l18-8-18-8v6l13 2-13 2z"/>
-</svg>
+<div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Ketik pesan...">
+    <button onclick="sendMessage()">Kirim</button>
+    <input type="file" id="imageInput" accept="image/*" hidden>
+    <button onclick="document.getElementById('imageInput').click()">Foto</button>
 </div>
 
-</div>
-</div>
-
-<div id="emojiPanel">
-<span onclick="addEmoji('😂')" style="font-size:24px;margin:6px;">😂</span>
-<span onclick="addEmoji('😭')" style="font-size:24px;margin:6px;">😭</span>
-<span onclick="addEmoji('❤️')" style="font-size:24px;margin:6px;">❤️</span>
-<span onclick="addEmoji('🔥')" style="font-size:24px;margin:6px;">🔥</span>
-</div>
-
-<div id="overlay"></div>
-
-<div id="viewer">
-<img id="viewerImg">
-<button class="viewerBtn" onclick="saveImage()">Simpan</button>
-<button class="viewerBtn" onclick="closeViewer()">Tutup</button>
+<div class="modal" id="imageModal">
+    <img id="modalImg">
+    <button onclick="downloadImage()">Simpan</button>
+    <button onclick="closeModal()">Tutup</button>
 </div>
 
 <script>
-const chatArea=document.getElementById("chatArea");
-const input=document.getElementById("msgInput");
-const fileInput=document.getElementById("fileInput");
-const overlay=document.getElementById("overlay");
-const viewer=document.getElementById("viewer");
-const viewerImg=document.getElementById("viewerImg");
+const chat = document.getElementById("chatContainer");
+const input = document.getElementById("messageInput");
+const imageInput = document.getElementById("imageInput");
+const modal = document.getElementById("imageModal");
+const modalImg = document.getElementById("modalImg");
 
-function getTime(){
-const d=new Date();
-return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0');
+function getTime() {
+    const now = new Date();
+    return now.getHours().toString().padStart(2,'0') + ":" +
+           now.getMinutes().toString().padStart(2,'0');
 }
 
-function sendMessage(){
-if(!input.value.trim()) return;
-createBubble(input.value,false);
-input.value="";
+function scrollToBottom() {
+    chat.scrollTop = chat.scrollHeight;
 }
 
-function createBubble(content,isImage){
-const bubble=document.createElement("div");
-bubble.className="bubble"+(isImage?" image":"");
-
-if(isImage){
-const img=document.createElement("img");
-img.src=content;
-img.onclick=()=>openViewer(content);
-bubble.appendChild(img);
-}else{
-bubble.textContent=content;
+function statusIcon(read=false) {
+    return `
+    <svg viewBox="0 0 24 24" class="${read ? 'blue' : ''}">
+        <path d="M1 13l4 4L15 7" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M7 13l4 4L21 7" stroke="currentColor" stroke-width="2" fill="none"/>
+    </svg>`;
 }
 
-const meta=document.createElement("div");
-meta.className="meta"+(isImage?" image":"");
-meta.innerHTML=`<span>${getTime()}</span> <span class="check">✔✔</span>`;
-bubble.appendChild(meta);
+function sendMessage() {
+    if(!input.value.trim()) return;
 
-chatArea.appendChild(bubble);
-chatArea.scrollTop=chatArea.scrollHeight;
+    const msg = document.createElement("div");
+    msg.className = "message sent";
 
-/* Check anim only */
-setTimeout(()=>meta.querySelector(".check").style.color="#4FC3F7",2000);
+    msg.innerHTML = `
+        ${input.value}
+        <div class="meta">
+            <span>${getTime()}</span>
+            ${statusIcon(false)}
+        </div>
+    `;
 
-/* Long press */
-let timer;
-bubble.addEventListener("pointerdown",()=>{timer=setTimeout(()=>showMenu(bubble),400);});
-bubble.addEventListener("pointerup",()=>clearTimeout(timer));
+    msg.onclick = () => deleteMessage(msg);
+
+    chat.appendChild(msg);
+    input.value = "";
+    scrollToBottom();
+
+    setTimeout(() => {
+        msg.querySelector("svg").classList.add("blue");
+    }, 1500);
 }
 
-fileInput.onchange=function(e){
-const reader=new FileReader();
-reader.onload=function(){createBubble(reader.result,true);}
-reader.readAsDataURL(e.target.files[0]);
+function deleteMessage(msg) {
+    msg.innerHTML = `
+        <span class="deleted">Pesan telah dihapus</span>
+        <div class="meta">
+            <span>${getTime()}</span>
+        </div>
+    `;
 }
 
-function showMenu(bubble){
-overlay.style.display="block";
-const menu=document.createElement("div");
-menu.className="menu";
-menu.innerHTML=`
-<div onclick="deleteMsg()" style="padding:10px;color:#ff453a;">Delete</div>
-<hr style="border:.5px solid rgba(255,255,255,.2);">
-<div onclick="editMsg()" style="padding:10px;">Edit</div>
-<hr style="border:.5px solid rgba(255,255,255,.2);">
-<div onclick="closeMenu()" style="padding:10px;">Batal</div>
-`;
-document.body.appendChild(menu);
-window.currentBubble=bubble;
-window.currentMenu=menu;
+imageInput.addEventListener("change", function(){
+    const file = this.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const msg = document.createElement("div");
+        msg.className = "message sent";
+
+        msg.innerHTML = `
+            <div class="chat-image">
+                <img src="${e.target.result}">
+            </div>
+            <div class="meta">
+                <span>${getTime()}</span>
+                ${statusIcon(false)}
+            </div>
+        `;
+
+        msg.querySelector("img").onclick = () => openModal(e.target.result);
+        msg.onclick = () => deleteMessage(msg);
+
+        chat.appendChild(msg);
+        scrollToBottom();
+
+        setTimeout(() => {
+            msg.querySelector("svg").classList.add("blue");
+        }, 1500);
+    };
+
+    reader.readAsDataURL(file);
+});
+
+function openModal(src) {
+    modal.style.display = "flex";
+    modalImg.src = src;
 }
 
-function closeMenu(){
-overlay.style.display="none";
-if(window.currentMenu) window.currentMenu.remove();
+function closeModal() {
+    modal.style.display = "none";
 }
 
-function deleteMsg(){
-const b=window.currentBubble;
-b.style.animation="collapse .25s forwards";
-setTimeout(()=>{
-b.innerHTML="<div class='deleted'>Pesan telah dihapus</div>";
-b.style.animation="fadeIn .2s";
-},250);
-closeMenu();
-}
-
-function editMsg(){
-const t=prompt("Edit pesan:");
-if(t) window.currentBubble.firstChild.textContent=t;
-closeMenu();
-}
-
-function toggleEmoji(){
-emojiPanel.style.display=emojiPanel.style.display==="block"?"none":"block";
-}
-
-function addEmoji(e){input.value+=e;}
-
-function openViewer(src){
-viewer.style.display="flex";
-overlay.style.display="block";
-viewerImg.src=src;
-}
-
-function closeViewer(){
-viewer.style.display="none";
-overlay.style.display="none";
-}
-
-function saveImage(){
-const a=document.createElement("a");
-a.href=viewerImg.src;
-a.download="image.jpg";
-a.click();
+function downloadImage() {
+    const link = document.createElement("a");
+    link.href = modalImg.src;
+    link.download = "chat-image.jpg";
+    link.click();
 }
 </script>
 
