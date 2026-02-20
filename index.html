@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram iOS Ultimate</title>
+<title>Telegram iOS Full Stable</title>
 
 <style>
 body{
@@ -11,8 +11,7 @@ height:100vh;
 display:flex;
 flex-direction:column;
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#0b141a;
-color:white;
+background:url('https://i.imgur.com/3ZQ3Z6C.jpg') center/cover no-repeat;
 }
 
 *{-webkit-user-select:none;user-select:none;}
@@ -26,8 +25,9 @@ flex-direction:column;
 gap:4px;
 }
 
+/* ===== ANIMATIONS ===== */
 @keyframes bubbleIn{
-0%{transform:translateY(8px) scale(.95);opacity:0;}
+0%{transform:translateY(10px) scale(.95);opacity:0;}
 100%{transform:translateY(0) scale(1);opacity:1;}
 }
 
@@ -41,18 +41,25 @@ from{opacity:0;}
 to{opacity:1;}
 }
 
+@keyframes slideUp{
+from{transform:translateY(100%);}
+to{transform:translateY(0);}
+}
+
+/* ===== BUBBLE ===== */
 .bubble{
 align-self:flex-end;
 background:#248C46;
+color:white;
 border-radius:18px;
 max-width:75%;
-position:relative;
-animation:bubbleIn .25s cubic-bezier(.34,1.56,.64,1);
-overflow:hidden;
+padding:8px 12px;
 display:inline-flex;
 flex-wrap:wrap;
 align-items:flex-end;
-padding:8px 12px;
+animation:bubbleIn .25s cubic-bezier(.34,1.56,.64,1);
+position:relative;
+overflow:hidden;
 font-size:14px;
 }
 
@@ -60,12 +67,12 @@ font-size:14px;
 width:100%;
 display:block;
 border-radius:16px;
-border:1px solid rgba(255,255,255,.15); /* BORDER TIPIS */
+border:1px solid rgba(255,255,255,.2);
 }
 
 .meta{
 font-size:11px;
-opacity:.85;
+opacity:.9;
 margin-left:6px;
 white-space:nowrap;
 }
@@ -74,45 +81,97 @@ white-space:nowrap;
 position:absolute;
 right:8px;
 bottom:6px;
-background:linear-gradient(to top,rgba(0,0,0,.5),transparent);
+background:rgba(0,0,0,.4);
 padding:2px 6px;
 border-radius:10px;
 }
 
 .deleted{
-font-size:13px;
 opacity:.6;
 font-style:italic;
+font-size:13px;
 }
 
-.overlay{
+/* ===== INPUT BAR ===== */
+.inputBar{
+padding:10px 12px;
+background:transparent;
+}
+
+.inputInner{
+display:flex;
+align-items:center;
+background:#1f2c34;
+border-radius:999px;
+height:44px;
+padding:0 12px;
+box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+
+.inputInner input{
+flex:1;
+border:none;
+outline:none;
+background:transparent;
+color:white;
+font-size:16px;
+}
+
+/* ===== EMOJI PANEL ===== */
+#emojiPanel{
+display:none;
+background:rgba(0,0,0,.6);
+backdrop-filter:blur(12px);
+padding:10px;
+animation:slideUp .25s ease;
+}
+
+/* ===== OVERLAY ===== */
+#overlay{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,.7);
-backdrop-filter:blur(10px);
+background:rgba(0,0,0,.5);
+backdrop-filter:blur(12px);
 display:none;
 z-index:20;
 }
 
-.viewer{
+/* ===== MENU ===== */
+.menu{
+position:fixed;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+background:rgba(28,28,30,.95);
+color:white;
+border-radius:18px;
+padding:12px;
+width:220px;
+z-index:30;
+animation:fadeIn .2s;
+}
+
+/* ===== VIEWER ===== */
+#viewer{
 position:fixed;
 inset:0;
 display:none;
 justify-content:center;
 align-items:center;
 flex-direction:column;
-z-index:30;
-animation:fadeIn .2s ease;
+background:rgba(0,0,0,.9);
+z-index:40;
+animation:fadeIn .2s;
 }
 
-.viewer img{
+#viewer img{
 max-width:90%;
 max-height:70%;
 border-radius:16px;
 }
 
-.viewer button{
-margin-top:15px;
+.viewerBtn{
+margin-top:12px;
 padding:10px 20px;
 border:none;
 border-radius:14px;
@@ -128,23 +187,34 @@ font-size:14px;
 <div id="chatArea"></div>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- INPUT BAR -->
-<div style="padding:10px 12px;">
-<div style="display:flex;align-items:center;background:#1f2c34;border-radius:999px;height:44px;padding:0 12px;">
-<input id="msgInput" type="text" placeholder="Message"
-style="flex:1;border:none;outline:none;background:transparent;color:white;font-size:16px;">
-<div onclick="sendMessage()" style="width:40px;height:40px;background:#2AABEE;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;">
-➤
-</div>
+<!-- INPUT -->
+<div class="inputBar">
+<div class="inputInner">
+
+<div onclick="toggleEmoji()" style="margin-right:10px;cursor:pointer;">😊</div>
+
+<input id="msgInput" placeholder="Message">
+
+<div onclick="fileInput.click()" style="margin-right:10px;cursor:pointer;">📎</div>
+
+<div onclick="sendMessage()" style="background:#2AABEE;width:36px;height:36px;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;">➤</div>
+
 </div>
 </div>
 
-<div class="overlay" id="overlay"></div>
+<div id="emojiPanel">
+<span onclick="addEmoji('😂')" style="font-size:24px;margin:6px;">😂</span>
+<span onclick="addEmoji('😭')" style="font-size:24px;margin:6px;">😭</span>
+<span onclick="addEmoji('❤️')" style="font-size:24px;margin:6px;">❤️</span>
+<span onclick="addEmoji('🔥')" style="font-size:24px;margin:6px;">🔥</span>
+</div>
 
-<div class="viewer" id="viewer">
+<div id="overlay"></div>
+
+<div id="viewer">
 <img id="viewerImg">
-<button onclick="saveImage()">Simpan</button>
-<button onclick="closeViewer()">Tutup</button>
+<button class="viewerBtn" onclick="saveImage()">Simpan</button>
+<button class="viewerBtn" onclick="closeViewer()">Tutup</button>
 </div>
 
 <script>
@@ -177,23 +247,19 @@ img.src=content;
 img.onclick=()=>openViewer(content);
 bubble.appendChild(img);
 }else{
-const text=document.createElement("span");
-text.textContent=content;
-bubble.appendChild(text);
+bubble.textContent=content;
 }
 
 const meta=document.createElement("div");
 meta.className="meta"+(isImage?" image":"");
-meta.innerHTML=getTime()+` <span class="check" style="color:rgba(255,255,255,.6)">✔✔</span>`;
+meta.innerHTML=getTime()+" ✔✔";
 bubble.appendChild(meta);
 
 chatArea.appendChild(bubble);
 chatArea.scrollTop=chatArea.scrollHeight;
 
-setTimeout(()=>{
-meta.querySelector(".check").style.transition="color .3s";
-meta.querySelector(".check").style.color="#4FC3F7";
-},2000);
+/* Check anim */
+setTimeout(()=>meta.style.color="#4FC3F7",2000);
 
 /* Long press */
 let timer;
@@ -210,20 +276,13 @@ reader.readAsDataURL(e.target.files[0]);
 function showMenu(bubble){
 overlay.style.display="block";
 const menu=document.createElement("div");
-menu.style.position="fixed";
-menu.style.left="50%";
-menu.style.top="50%";
-menu.style.transform="translate(-50%,-50%)";
-menu.style.background="rgba(28,28,30,.95)";
-menu.style.borderRadius="18px";
-menu.style.padding="12px";
-menu.style.color="white";
+menu.className="menu";
 menu.innerHTML=`
-<div onclick="deleteMsg()" style="padding:12px;color:#ff453a;">Delete</div>
+<div onclick="deleteMsg()" style="padding:10px;color:#ff453a;">Delete</div>
 <hr style="border:.5px solid rgba(255,255,255,.2);">
-<div onclick="editMsg()" style="padding:12px;">Edit</div>
+<div onclick="editMsg()" style="padding:10px;">Edit</div>
 <hr style="border:.5px solid rgba(255,255,255,.2);">
-<div onclick="closeMenu()" style="padding:12px;">Batal</div>
+<div onclick="closeMenu()" style="padding:10px;">Batal</div>
 `;
 document.body.appendChild(menu);
 window.currentBubble=bubble;
@@ -232,7 +291,7 @@ window.currentMenu=menu;
 
 function closeMenu(){
 overlay.style.display="none";
-if(window.currentMenu) document.body.removeChild(window.currentMenu);
+if(window.currentMenu) window.currentMenu.remove();
 }
 
 function deleteMsg(){
@@ -246,10 +305,17 @@ closeMenu();
 }
 
 function editMsg(){
-const newText=prompt("Edit pesan:");
-if(newText) window.currentBubble.firstChild.textContent=newText;
+const t=prompt("Edit pesan:");
+if(t) window.currentBubble.firstChild.textContent=t;
 closeMenu();
 }
+
+function toggleEmoji(){
+const p=document.getElementById("emojiPanel");
+p.style.display=p.style.display==="block"?"none":"block";
+}
+
+function addEmoji(e){input.value+=e;}
 
 function openViewer(src){
 viewer.style.display="flex";
