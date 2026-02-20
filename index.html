@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Telegram iOS Perfect</title>
+<title>Telegram iOS Ultimate</title>
 
 <style>
 body{
@@ -11,9 +11,8 @@ height:100vh;
 display:flex;
 flex-direction:column;
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:url('https://res.cloudinary.com/dtdodhqqi/image/upload/v1771310542/c36725a5a2a254a5df8c7dd4bdaa05af_v3tzna.jpg');
-background-size:cover;
-background-position:center;
+background:#0b141a;
+color:white;
 }
 
 *{-webkit-user-select:none;user-select:none;}
@@ -28,8 +27,8 @@ gap:4px;
 }
 
 @keyframes bubbleIn{
-0%{transform:translateX(30px) scale(.9);opacity:0;}
-100%{transform:translateX(0) scale(1);opacity:1;}
+0%{transform:translateY(8px) scale(.95);opacity:0;}
+100%{transform:translateY(0) scale(1);opacity:1;}
 }
 
 @keyframes collapse{
@@ -37,14 +36,89 @@ gap:4px;
 100%{opacity:0;max-height:0;}
 }
 
-@keyframes popupIn{
-0%{transform:translate(-50%,-50%) scale(.8);opacity:0;}
-100%{transform:translate(-50%,-50%) scale(1);opacity:1;}
+@keyframes fadeIn{
+from{opacity:0;}
+to{opacity:1;}
 }
 
-@keyframes slideUp{
-0%{transform:translateY(100%);}
-100%{transform:translateY(0);}
+.bubble{
+align-self:flex-end;
+background:#248C46;
+border-radius:18px;
+max-width:75%;
+position:relative;
+animation:bubbleIn .25s cubic-bezier(.34,1.56,.64,1);
+overflow:hidden;
+display:inline-flex;
+flex-wrap:wrap;
+align-items:flex-end;
+padding:8px 12px;
+font-size:14px;
+}
+
+.bubble img{
+width:100%;
+display:block;
+border-radius:16px;
+border:1px solid rgba(255,255,255,.15); /* BORDER TIPIS */
+}
+
+.meta{
+font-size:11px;
+opacity:.85;
+margin-left:6px;
+white-space:nowrap;
+}
+
+.meta.image{
+position:absolute;
+right:8px;
+bottom:6px;
+background:linear-gradient(to top,rgba(0,0,0,.5),transparent);
+padding:2px 6px;
+border-radius:10px;
+}
+
+.deleted{
+font-size:13px;
+opacity:.6;
+font-style:italic;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+backdrop-filter:blur(10px);
+display:none;
+z-index:20;
+}
+
+.viewer{
+position:fixed;
+inset:0;
+display:none;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+z-index:30;
+animation:fadeIn .2s ease;
+}
+
+.viewer img{
+max-width:90%;
+max-height:70%;
+border-radius:16px;
+}
+
+.viewer button{
+margin-top:15px;
+padding:10px 20px;
+border:none;
+border-radius:14px;
+background:#1c1c1e;
+color:white;
+font-size:14px;
 }
 </style>
 </head>
@@ -54,54 +128,32 @@ gap:4px;
 <div id="chatArea"></div>
 <input type="file" id="fileInput" accept="image/*" style="display:none">
 
-<!-- KOLOM KETIK (ASLI TIDAK DIUBAH) -->
-<div style="padding:10px 12px;position:relative;z-index:5;">
-<div style="display:flex;align-items:center;background:#1f2c34;border-radius:999px;height:44px;padding:0 12px;box-shadow:0 4px 12px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.05);">
-
-<svg onclick="toggleEmoji()" viewBox="0 0 24 24"
-fill="none" stroke="#2AABEE" stroke-width="2"
-stroke-linecap="round" stroke-linejoin="round"
-style="width:24px;height:24px;transform:scale(1.8);margin-right:16px;cursor:pointer;">
-<circle cx="12" cy="12" r="9"/>
-<circle cx="9" cy="10" r="0.8" fill="#2AABEE" stroke="none"/>
-<circle cx="15" cy="10" r="0.8" fill="#2AABEE" stroke="none"/>
-<path d="M8 14c2.2 2.4 5.8 2.4 8 0"/>
-</svg>
-
+<!-- INPUT BAR -->
+<div style="padding:10px 12px;">
+<div style="display:flex;align-items:center;background:#1f2c34;border-radius:999px;height:44px;padding:0 12px;">
 <input id="msgInput" type="text" placeholder="Message"
-style="flex:1;border:none;outline:none;background:transparent;color:white;font-size:16px;height:100%;">
-
-<svg onclick="document.getElementById('fileInput').click()" viewBox="0 0 24 24"
-fill="none" stroke="#2AABEE" stroke-width="2"
-stroke-linecap="round" stroke-linejoin="round"
-style="width:24px;height:24px;transform:scale(1.8);margin-right:8px;cursor:pointer;">
-<path d="M7 13l6-6a3 3 0 114 4l-8 8a5 5 0 11-7-7l9-9"/>
-</svg>
-
-<div onclick="sendMessage()" style="width:44px;height:44px;min-width:44px;min-height:44px;flex-shrink:0;background:#2AABEE;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4);">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-<path d="M3 20l18-8-18-8v6l13 2-13 2z"/>
-</svg>
+style="flex:1;border:none;outline:none;background:transparent;color:white;font-size:16px;">
+<div onclick="sendMessage()" style="width:40px;height:40px;background:#2AABEE;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;">
+➤
 </div>
-
 </div>
 </div>
 
-<!-- EMOJI PANEL -->
-<div id="emojiPanel" style="display:none;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);padding:12px;animation:slideUp .25s ease;">
-<span onclick="addEmoji('😭')" style="font-size:26px;margin:8px;">😭</span>
-<span onclick="addEmoji('😂')" style="font-size:26px;margin:8px;">😂</span>
-<span onclick="addEmoji('❤️')" style="font-size:26px;margin:8px;">❤️</span>
-<span onclick="addEmoji('👍')" style="font-size:26px;margin:8px;">👍</span>
-</div>
+<div class="overlay" id="overlay"></div>
 
-<div id="overlay" style="position:fixed;inset:0;display:none;background:rgba(0,0,0,.4);backdrop-filter:blur(12px);z-index:10;"></div>
+<div class="viewer" id="viewer">
+<img id="viewerImg">
+<button onclick="saveImage()">Simpan</button>
+<button onclick="closeViewer()">Tutup</button>
+</div>
 
 <script>
 const chatArea=document.getElementById("chatArea");
 const input=document.getElementById("msgInput");
 const fileInput=document.getElementById("fileInput");
 const overlay=document.getElementById("overlay");
+const viewer=document.getElementById("viewer");
+const viewerImg=document.getElementById("viewerImg");
 
 function getTime(){
 const d=new Date();
@@ -109,44 +161,29 @@ return d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().pad
 }
 
 function sendMessage(){
-if(input.value.trim()==="") return;
+if(!input.value.trim()) return;
 createBubble(input.value,false);
 input.value="";
 }
 
 function createBubble(content,isImage){
-
 const bubble=document.createElement("div");
-bubble.style.alignSelf="flex-end";
-bubble.style.background="#248C46";
-bubble.style.color="white";
-bubble.style.borderRadius="18px";
-bubble.style.maxWidth="75%";
-bubble.style.animation="bubbleIn .25s cubic-bezier(.34,1.56,.64,1)";
-bubble.style.overflow="hidden";
-bubble.style.display="inline-flex";
-bubble.style.flexWrap="wrap";
-bubble.style.alignItems="flex-end";
-bubble.style.padding=isImage?"0":"8px 12px";
+bubble.className="bubble";
 
 if(isImage){
+bubble.style.padding="0";
 const img=document.createElement("img");
 img.src=content;
-img.style.width="100%";
-img.style.display="block";
+img.onclick=()=>openViewer(content);
 bubble.appendChild(img);
-}
-
-if(!isImage){
+}else{
 const text=document.createElement("span");
 text.textContent=content;
 bubble.appendChild(text);
 }
 
-const meta=document.createElement("span");
-meta.style.fontSize="11px";
-meta.style.opacity=".85";
-meta.style.marginLeft="6px";
+const meta=document.createElement("div");
+meta.className="meta"+(isImage?" image":"");
 meta.innerHTML=getTime()+` <span class="check" style="color:rgba(255,255,255,.6)">✔✔</span>`;
 bubble.appendChild(meta);
 
@@ -154,11 +191,11 @@ chatArea.appendChild(bubble);
 chatArea.scrollTop=chatArea.scrollHeight;
 
 setTimeout(()=>{
-meta.querySelector(".check").style.transition="color .3s ease";
+meta.querySelector(".check").style.transition="color .3s";
 meta.querySelector(".check").style.color="#4FC3F7";
 },2000);
 
-/* Long Press */
+/* Long press */
 let timer;
 bubble.addEventListener("pointerdown",()=>{timer=setTimeout(()=>showMenu(bubble),400);});
 bubble.addEventListener("pointerup",()=>clearTimeout(timer));
@@ -172,20 +209,15 @@ reader.readAsDataURL(e.target.files[0]);
 
 function showMenu(bubble){
 overlay.style.display="block";
-
 const menu=document.createElement("div");
 menu.style.position="fixed";
 menu.style.left="50%";
 menu.style.top="50%";
 menu.style.transform="translate(-50%,-50%)";
 menu.style.background="rgba(28,28,30,.95)";
-menu.style.color="white";
 menu.style.borderRadius="18px";
 menu.style.padding="12px";
-menu.style.width="220px";
-menu.style.animation="popupIn .25s cubic-bezier(.34,1.56,.64,1)";
-menu.style.zIndex="20";
-
+menu.style.color="white";
 menu.innerHTML=`
 <div onclick="deleteMsg()" style="padding:12px;color:#ff453a;">Delete</div>
 <hr style="border:.5px solid rgba(255,255,255,.2);">
@@ -193,7 +225,6 @@ menu.innerHTML=`
 <hr style="border:.5px solid rgba(255,255,255,.2);">
 <div onclick="closeMenu()" style="padding:12px;">Batal</div>
 `;
-
 document.body.appendChild(menu);
 window.currentBubble=bubble;
 window.currentMenu=menu;
@@ -207,7 +238,10 @@ if(window.currentMenu) document.body.removeChild(window.currentMenu);
 function deleteMsg(){
 const b=window.currentBubble;
 b.style.animation="collapse .25s forwards";
-setTimeout(()=>b.remove(),250);
+setTimeout(()=>{
+b.innerHTML="<div class='deleted'>Pesan telah dihapus</div>";
+b.style.animation="fadeIn .2s";
+},250);
 closeMenu();
 }
 
@@ -217,12 +251,23 @@ if(newText) window.currentBubble.firstChild.textContent=newText;
 closeMenu();
 }
 
-function toggleEmoji(){
-const p=document.getElementById("emojiPanel");
-p.style.display=p.style.display==="none"?"block":"none";
+function openViewer(src){
+viewer.style.display="flex";
+overlay.style.display="block";
+viewerImg.src=src;
 }
 
-function addEmoji(e){input.value+=e;}
+function closeViewer(){
+viewer.style.display="none";
+overlay.style.display="none";
+}
+
+function saveImage(){
+const a=document.createElement("a");
+a.href=viewerImg.src;
+a.download="image.jpg";
+a.click();
+}
 </script>
 
 </body>
